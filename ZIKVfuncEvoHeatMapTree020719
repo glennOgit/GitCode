@@ -1,0 +1,20 @@
+#!/usr/bin/env Rscript
+
+library(ggtree)
+library(tidyverse)
+library(phytools)
+tree <- read.tree("RAxML_bestTree.2018.01.22_ZIKVplusAsia")
+ggplot(tree) + geom_tree() + theme_tree()
+tree <- midpoint.root(tree)
+t <- ggtree(tree)
+
+genotype <- read.table("phyloHeatv3.tsv",sep="\t",stringsAsFactors = F,header = T)
+colnames(genotype) <- sub("\\.$", "", colnames(genotype))
+rownames(genotype) <- genotype$X
+gheatmap(t, genotype[,c("CladeA","CladeB","CladeC","CladeD","CladeE","CladeF","CladeG","CladeH","CladeI","CladeJ","PA1","PA2","PA3")], width = 1,colnames_angle=90,color = "black")
+
+regions3 <- read.csv(file="regions2.csv", header=TRUE, sep=",")
+rownames(regions3) <- regions3$regiondf
+#
+t2 <- t %<+% regions3 + geom_tippoint(aes(color=place),size=1) + scale_color_manual(breaks=c("SE Asia","Oceania","North America","South America"),values = c("deepskyblue4","green4", "orange2","tan4")) + theme(legend.position="left")
+gheatmap(t2,genotype[,c("CladeA","CladeB","CladeC","CladeD","CladeE","CladeF","CladeG","CladeH","CladeI","CladeJ","PA1","PA2","PA3")], width = .5,colnames_angle=90,color = "black",colnames = F)
